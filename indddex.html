@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Tracker — Yigit Cem Gultekin</title>
+<style>
+  :root {
+    --bg:#ffffff;--bg2:#f5f5f3;--bg3:#eeede9;
+    --text:#1a1a1a;--text2:#6b6b68;--text3:#9b9b98;
+    --border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.2);
+    --teal:#1D9E75;--amber:#BA7517;--red:#E24B4A;
+    --teal-bg:#E1F5EE;--teal-t:#085041;
+    --amber-bg:#FAEEDA;--amber-t:#633806;
+    --red-bg:#FCEBEB;--red-t:#791F1F;
+    --blue-bg:#E6F1FB;--blue-t:#0C447C;
+    --new-bg:#eaf3de;--new-t:#27500A;
+    --r:8px;--rl:12px;
+  }
+  @media(prefers-color-scheme:dark){
+    :root{
+      --bg:#1c1c1a;--bg2:#242422;--bg3:#2e2e2b;
+      --text:#f0efe9;--text2:#a8a8a4;--text3:#686864;
+      --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.2);
+      --teal-bg:#04342C;--teal-t:#9FE1CB;
+      --amber-bg:#412402;--amber-t:#FAC775;
+      --red-bg:#501313;--red-t:#F7C1C1;
+      --blue-bg:#042C53;--blue-t:#B5D4F4;
+      --new-bg:#173404;--new-t:#C0DD97;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
+  .wrap{max-width:720px;margin:0 auto;padding:1.5rem 1rem 3rem}
+  .header{margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:0.5px solid var(--border)}
+  .header h1{font-size:18px;font-weight:500}
+  .header p{font-size:12px;color:var(--text2);margin-top:3px}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.25rem}
+  @media(min-width:480px){.stats{grid-template-columns:repeat(4,1fr)}}
+  .stat{background:var(--bg2);border-radius:var(--r);padding:.75rem 1rem}
+  .stat-lbl{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+  .stat-val{font-size:22px;font-weight:500}
+  .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+  .fb{font-size:12px;padding:5px 11px;border:0.5px solid var(--border2);border-radius:20px;background:transparent;color:var(--text2);cursor:pointer}
+  .fb.on,.fb:hover{background:var(--bg2);color:var(--text)}
+  .sort-row{display:flex;align-items:center;gap:8px;margin-bottom:1rem;font-size:12px;color:var(--text2)}
+  .sort-row select{font-size:12px;border:0.5px solid var(--border);border-radius:var(--r);padding:4px 8px;background:var(--bg);color:var(--text)}
+  .card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rl);padding:1rem 1.1rem;margin-bottom:10px}
+  .card:hover{border-color:var(--border2)}
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .job-title{font-size:14px;font-weight:500;line-height:1.35}
+  .company{font-size:12px;color:var(--text2);margin-top:2px}
+  .ring-wrap{flex-shrink:0;width:44px;height:44px;position:relative}
+  .ring-wrap svg{width:44px;height:44px;transform:rotate(-90deg)}
+  .ring-track{fill:none;stroke:var(--border);stroke-width:4}
+  .ring-fill{fill:none;stroke-width:4;stroke-linecap:round}
+  .ring-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500}
+  .meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
+  .badge{font-size:11px;padding:3px 8px;border-radius:10px;font-weight:500}
+  .b-loc{background:var(--bg2);color:var(--text2);border:0.5px solid var(--border)}
+  .b-type{background:var(--blue-bg);color:var(--blue-t)}
+  .b-new{background:var(--new-bg);color:var(--new-t)}
+  .b-date{font-size:11px;color:var(--text3)}
+  .skills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+  .skill{font-size:11px;padding:3px 7px;border-radius:6px;background:var(--bg2);color:var(--text2);border:0.5px solid var(--border)}
+  .why{font-size:12px;color:var(--text2);line-height:1.5;padding:8px 10px;border-left:2px solid var(--border2);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;margin-bottom:8px}
+  .notes{font-size:11px;color:var(--text3);margin-bottom:8px;font-style:italic}
+  .card-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .apply-btn{font-size:12px;padding:6px 14px;border:0.5px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text);text-decoration:none}
+  .apply-btn:hover{background:var(--bg2)}
+  .status-sel{font-size:11px;padding:5px 8px;border:0.5px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text2)}
+  .empty{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:14px}
+  .footer{font-size:11px;color:var(--text3);text-align:right;margin-top:1.5rem;padding-top:1rem;border-top:0.5px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>Job tracker — Yigit Cem Gultekin</h1>
+    <p>Materials Science &middot; R&amp;D &middot; Üretim &middot; Quality &middot; Germany &middot; Son tarama: 19 Nisan 2026</p>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-lbl">Toplam</div><div class="stat-val" id="s-total">0</div></div>
+    <div class="stat"><div class="stat-lbl">Başvurulan</div><div class="stat-val" id="s-applied">0</div></div>
+    <div class="stat"><div class="stat-lbl">Ort. match</div><div class="stat-val" id="s-avg">—</div></div>
+    <div class="stat"><div class="stat-lbl">Atlandı</div><div class="stat-val" id="s-skip">0</div></div>
+  </div>
+  <div class="filters">
+    <button class="fb on" onclick="setFilter('all',this)">Tümü</button>
+    <button class="fb" onclick="setFilter('new',this)">Başvurulmadı</button>
+    <button class="fb" onclick="setFilter('applied',this)">Başvuruldu</button>
+    <button class="fb" onclick="setFilter('R&D',this)">R&amp;D</button>
+    <button class="fb" onclick="setFilter('Quality',this)">Quality</button>
+    <button class="fb" onclick="setFilter('Üretim',this)">Üretim</button>
+    <button class="fb" onclick="setFilter('today',this)">Bugün eklendi</button>
+  </div>
+  <div class="sort-row">
+    Sırala:
+    <select onchange="setSort(this.value)">
+      <option value="date">En yeni önce</option>
+      <option value="match">En iyi match</option>
+    </select>
+  </div>
+  <div id="job-list"></div>
+  <div class="footer" id="footer"></div>
+</div>
+<script>
+const SK='jt-statuses-v2';
+const jobs=[
+  {id:5,isNew:true,title:"Materialwissenschaftler/in, Kunststoffingenieur/in, Chemieingenieur/in (m/w/d)",company:"Bundesanstalt für Wasserbau",location:"Karlsruhe, BW",type:"Vollzeit",salary:"€52.500–€69.500",posted:"2026-04-19",postedLabel:"Bugün — 19 Apr 2026",match:84,skills:["Polimer/Kunststoff","Charakterisierung","Chemische Analytik","Öffentlicher Dienst","MSc Werkstoffwissenschaften"],fit:"Bugün yayınlanan taze ilan. Devlet kurumu — iş güvencesi yüksek. Polimer/kompozit geçmişin + MSc'in tam aranan profile uyuyor. Karlsruhe Stuttgart'a yakın, taşınma gerektirmez.",link:"https://www.xing.com/jobs/karlsruhe-materialwissenschaftler-kunststoffingenieur-chemieingenieur-vglbar-153420869",notes:"Erken başvuran olma şansın var — bugün yayınlandı.",category:"R&D"},
+  {id:6,isNew:true,title:"Materialwissenschaftler / Laboringenieur (m/w/d)",company:"Duale Hochschule Baden-Württemberg",location:"Karlsruhe, BW",type:"Vollzeit",salary:"€51.000–€64.500",posted:"2026-04-18",postedLabel:"18 Apr 2026",match:80,skills:["Laboringenieur","Charakterisierung","Materialanalytik","Forschung","BW"],fit:"Dün yayınlandı, erken başvuran statüsü hâlâ mevcut. DHBW kamu üniversitesi, Stuttgart'a yakın. SEM/XRD deneyimin doğrudan değerlendiriliyor.",link:"https://www.xing.com/jobs/karlsruhe-materialwissenschaftler-laboringenieur-153376747",notes:"DHBW devlet üniversitesi — iş güvencesi iyi, Karlsruhe Stuttgart'a ~80 km.",category:"R&D"},
+  {id:9,isNew:true,title:"Materials Engineer (w/m/d)",company:"Siemens Energy Global GmbH & Co. KG",location:"Berlin",type:"Vollzeit",salary:"€63.500–€76.500",posted:"2026-04-15",postedLabel:"15 Apr 2026",match:78,skills:["Materials Engineering","Charakterisierung","Enerji Teknolojisi","R&D","SEM/XRD"],fit:"Siemens Energy'ye daha önce cover letter yazmıştın. Tezindeki yakıt hücresi/enerji malzemeleri geçmişin bu role güçlü bağlantı kuruyor.",link:"https://www.xing.com/jobs/berlin-materials-engineer-153255639",notes:"Berlin'e taşınmaya hazır olduğunu daha önce belirtmiştin.",category:"R&D"},
+  {id:8,isNew:true,title:"Materials Failure Analyst (d/f/m) für AIRBUS",company:"SimpleXX GmbH",location:"Bremen",type:"Vollzeit",salary:"€47.500–€64.500",posted:"2026-04-18",postedLabel:"18 Apr 2026",match:74,skills:["Failure Analysis","Metallographie","SEM/EDX","Aerospace","Werkstoffprüfung"],fit:"Airbus için dış kaynak. Hasar analizi ve malzeme testi odaklı. SEM/EDX + metallografik deneyimin (Beycelik stajı) bu role doğrudan uyuyor.",link:"https://www.xing.com/jobs/bremen-materials-failure-analyst-airbus-153378660",notes:"Bremen uzak ama Airbus deneyimi CV'ye büyük değer katar.",category:"Quality"},
+  {id:7,isNew:true,title:"Werkstoffspezialist Verdichterwerkstoffe (all gender)",company:"ALTEN Consulting Services GmbH",location:"München, Bayern",type:"Vollzeit",salary:"€56.000–€73.000",posted:"2026-04-18",postedLabel:"18 Apr 2026",match:72,skills:["Verdichterwerkstoffe","Metallurgie","Charakterisierung","Aerospace","Danışmanlık"],fit:"Havacılık sektörüne yönelik malzeme uzmanlığı. Metal/alaşım deneyimin + karakterizasyon bilgin uyuyor. ALTEN danışmanlık — farklı projelerde çalışma imkânı.",link:"https://www.xing.com/jobs/muenchen-werkstoffspezialist-verdichterwerkstoffe-all-gender-153392227",notes:"München Stuttgart'a ~2.5 saat — taşınmaya veya uzaktan açık mısın?",category:"Üretim"},
+  {id:1,isNew:false,title:"Chemieingenieur / Material- / Werkstoffwissenschaftler (m/w/d) in der Analytik",company:"Luculentus GmbH",location:"Steinbach (Taunus)",type:"Vollzeit",salary:"25–27 €/saat",posted:"2026-04-18",postedLabel:"18 Apr 2026",match:82,skills:["SEM/EDX","Charakterisierung","Materialanalytik","Klebeverbindungen","MSc Werkstoffwissenschaften"],fit:"MSc gereksinimi tam uyuyor. Karakterizasyon ve analitik deneyimin (SEM, FTIR, TGA) doğrudan bu rolle örtüşüyor.",link:"https://de.indeed.com/viewjob?jk=1b708285da3a63e2",notes:"Mail ile başvuru: bewerbung@luculentus.de — Almanca cover letter önerilir.",category:"R&D"},
+  {id:2,isNew:false,title:"Materialwissenschaftler – Plattenwerkstoffe (m/w/d)",company:"Knauf Gips KG",location:"Iphofen, Bayern (Homeoffice möglich)",type:"Vollzeit",salary:"~€63.765/yıl",posted:"2026-04-14",postedLabel:"14 Apr 2026",match:75,skills:["Polimer/Kompozit","Proses Optimizasyonu","Chemische Analytik","Produktion"],fit:"Polimer ve kompozit malzeme geçmişin bu rol için güçlü zemin sağlıyor. Homeoffice seçeneği var.",link:"https://www.jobvector.de/job/materialwissenschaftler-6c2e91025fa6e282/",notes:"~€63.765/yıl tahmini maaş.",category:"Üretim"},
+  {id:3,isNew:false,title:"Materialwissenschaftler als Compliance Manager (m/w/d)",company:"Northrop Grumman LITEF GmbH",location:"Freiburg im Breisgau (Homeoffice möglich)",type:"Vollzeit",salary:"~€70.582/yıl",posted:"2026-04-10",postedLabel:"10 Apr 2026",match:68,skills:["Material Compliance","Materialdeklarationen","Umwelttechnik","Werkstoffwissen"],fit:"Malzeme bilgin yeterli ama compliance/yasal deneyim eksik olabilir. Savunma sektörü.",link:"https://www.jobvector.de/job/materialwissenschaftler-74454c11b9aa905a/",notes:"Dikkat: Savunma firması, güvenlik izni gerekebilir.",category:"Quality"},
+  {id:4,isNew:false,title:"Werkstoffingenieurin Stahl / Stahltechnologie / Umformtechnik (w/m/d)",company:"GMH Gruppe SE & Co. KG",location:"Gröditz, Sachsen",type:"Vollzeit",salary:"—",posted:"2026-04-08",postedLabel:"08 Apr 2026",match:71,skills:["Metal/Alaşım","Metallographie","SEM/XRD","Werkstoffprüfung","Stahltechnologie"],fit:"Metal ve alaşım deneyimin + Beycelik Gestamp staj geçmişin bu role iyi uyuyor.",link:"https://de.indeed.com/viewjob?jk=ec9dc36ab2b7b2b4",notes:"Gröditz küçük bir kasaba — taşınma gerekebilir.",category:"R&D"}
+];
+function loadSt(){try{return JSON.parse(localStorage.getItem(SK)||'{}')}catch{return{}}}
+function saveSt(s){try{localStorage.setItem(SK,JSON.stringify(s))}catch{}}
+let statuses=loadSt(),filt='all',srt='date';
+function mc(p){return p>=80?'#1D9E75':p>=65?'#BA7517':'#E24B4A'}
+function ring(p,col){
+  const r=18,c=2*Math.PI*r,off=(c-(p/100)*c).toFixed(1);
+  return `<div class="ring-wrap"><svg viewBox="0 0 44 44"><circle class="ring-track" cx="22" cy="22" r="${r}"/><circle class="ring-fill" cx="22" cy="22" r="${r}" stroke="${col}" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off}"/></svg><div class="ring-pct">${p}%</div></div>`;
+}
+function card(j){
+  const st=statuses[j.id]||'new';
+  return `<div class="card" id="c${j.id}">
+    <div class="card-top">
+      <div style="flex:1;min-width:0"><div class="job-title">${j.title}</div>
+      <div class="company">${j.company}${j.salary&&j.salary!=='—'?` · <span style="color:var(--teal);font-size:11px">${j.salary}</span>`:''}</div></div>
+      ${ring(j.match,mc(j.match))}
+    </div>
+    <div class="meta">
+      <span class="badge b-loc">${j.location}</span>
+      <span class="badge b-type">${j.type}</span>
+      ${j.isNew?'<span class="badge b-new">Yeni</span>':''}
+      <span class="b-date">${j.postedLabel}</span>
+    </div>
+    <div class="skills">${j.skills.map(s=>`<span class="skill">${s}</span>`).join('')}</div>
+    <div class="why">${j.fit}</div>
+    ${j.notes?`<div class="notes">${j.notes}</div>`:''}
+    <div class="card-bottom">
+      <a class="apply-btn" href="${j.link}" target="_blank">Apply →</a>
+      <select class="status-sel" onchange="updSt(${j.id},this.value)">
+        <option value="new" ${st==='new'?'selected':''}>Başvurulmadı</option>
+        <option value="applied" ${st==='applied'?'selected':''}>Başvuruldu</option>
+        <option value="skip" ${st==='skip'?'selected':''}>Atla</option>
+      </select>
+    </div>
+  </div>`;
+}
+function updSt(id,val){statuses[id]=val;saveSt(statuses);stats()}
+function getList(){
+  let l=[...jobs];
+  if(filt==='new') l=l.filter(j=>(statuses[j.id]||'new')==='new');
+  else if(filt==='applied') l=l.filter(j=>statuses[j.id]==='applied');
+  else if(filt==='today') l=l.filter(j=>j.isNew);
+  else if(filt!=='all') l=l.filter(j=>j.category===filt);
+  return srt==='match'?l.sort((a,b)=>b.match-a.match):l.sort((a,b)=>new Date(b.posted)-new Date(a.posted));
+}
+function stats(){
+  const l=getList();
+  const applied=Object.values(statuses).filter(s=>s==='applied').length;
+  const skip=Object.values(statuses).filter(s=>s==='skip').length;
+  const avg=l.length?Math.round(l.reduce((s,j)=>s+j.match,0)/l.length):null;
+  document.getElementById('s-total').textContent=l.length;
+  document.getElementById('s-applied').textContent=applied;
+  document.getElementById('s-avg').textContent=avg?avg+'%':'—';
+  document.getElementById('s-skip').textContent=skip;
+}
+function render(){
+  const l=getList();
+  document.getElementById('job-list').innerHTML=l.length?l.map(card).join(''):'<div class="empty">Bu filtrede ilan yok.</div>';
+  stats();
+  document.getElementById('footer').textContent='Son güncelleme: 19 Nisan 2026 · Toplam '+jobs.length+' ilan';
+}
+function setFilter(f,btn){filt=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');render()}
+function setSort(s){srt=s;render()}
+render();
+</script>
+</body>
+</html>
